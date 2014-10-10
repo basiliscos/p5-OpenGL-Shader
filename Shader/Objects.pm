@@ -148,7 +148,7 @@ sub Load
   my $linked = glGetObjectParameterivARB_p($sp, GL_OBJECT_LINK_STATUS_ARB);
   if (!$linked)
   {
-    $stat = glGetInfoLogARB_p($sp);
+    my $stat = glGetInfoLogARB_p($sp);
     #print STDERR "Load shader: $stat\n";
     return "Link shader: $stat" if ($stat);
     return 'Unable to link shader';
