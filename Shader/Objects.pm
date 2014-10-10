@@ -14,6 +14,9 @@ package OpenGL::Shader::Objects;
 
 require Exporter;
 
+use strict;
+use warnings;
+
 use Carp;
 
 use vars qw($VERSION @ISA);
@@ -108,8 +111,13 @@ sub Load
     #print STDERR "Loaded fragment:\n$frag\n";
 
     glCompileShaderARB($self->{fragment_id});
-    my $stat = glGetInfoLogARB_p($self->{fragment_id});
-    return "Fragment shader: $stat" if ($stat);
+    my $compilation_status= glGetObjectParameterivARB_p(
+        $self->{fragment_id}, GL_OBJECT_COMPILE_STATUS_ARB
+    );
+    if ($compilation_status != GL_TRUE) {
+        my $stat = glGetInfoLogARB_p($self->{fragment_id});
+        return "Fragment shader: $stat" if ($stat);
+    }
   }
 
   # Load vertex code
@@ -123,10 +131,14 @@ sub Load
     #print STDERR "Loaded vertex:\n$vert\n";
 
     glCompileShaderARB($self->{vertex_id});
-    $stat = glGetInfoLogARB_p($self->{vertex_id});
-    return "Vertex shader: $stat" if ($stat);
+    my $compilation_status= glGetObjectParameterivARB_p(
+        $self->{vertex_id}, GL_OBJECT_COMPILE_STATUS_ARB
+    );
+    if ($compilation_status != GL_TRUE) {
+        my $stat = glGetInfoLogARB_p($self->{vertex_id});
+        return "Vertex shader: $stat" if ($stat);
+    }
   }
-
 
   # Link shaders
   my $sp = glCreateProgramObjectARB();
